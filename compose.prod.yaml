@@ -1,0 +1,10 @@
+
+services:
+  front:
+    build:
+      context: .
+      target: prod
+    environment:
+      NODE_ENV: production
+    ports:
+      - "${FRONT_PORT:-80}:80"
