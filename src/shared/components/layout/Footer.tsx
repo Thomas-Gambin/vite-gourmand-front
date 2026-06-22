@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { LEGAL_LINKS } from '../../config/navigation'
 import { OPENING_HOURS } from '../../config/openingHours'
 
+const CURRENT_YEAR = new Date().getFullYear()
+
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-border bg-surface-muted">
@@ -67,7 +69,16 @@ export function Footer() {
       </div>
 
       <div className="border-t border-border px-5 py-4 text-center text-xs text-text-muted">
-        © {new Date().getFullYear()} Vite &amp; Gourmand — Tous droits réservés.
+        © {CURRENT_YEAR}{' '}
+        <a
+          href="https://www.thomas-gambin.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-violet-600 transition hover:text-violet-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
+        >
+          Thomas Gambin
+        </a>{' '}
+        — Tous droits réservés.
       </div>
     </footer>
   )
