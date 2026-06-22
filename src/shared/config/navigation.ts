@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { FileText, Home, LogIn, Mail, Scale, Shield, UtensilsCrossed } from 'lucide-react'
+import { FileText, Home, Mail, Scale, Shield, UtensilsCrossed } from 'lucide-react'
 
 export type NavItem = {
   label: string
@@ -11,7 +11,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Accueil', to: '/', icon: Home },
   { label: 'Menus', to: '/menus', icon: UtensilsCrossed },
   { label: 'Contact', to: '/contact', icon: Mail },
-  { label: 'Connexion', to: '/login', icon: LogIn },
 ]
 
 export type LegalLink = {

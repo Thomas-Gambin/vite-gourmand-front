@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { NAV_ITEMS } from '../../config/navigation'
+import { UserMenu } from './UserMenu'
 
 type NavigationProps = {
   isOpen: boolean
@@ -61,6 +62,7 @@ export function Navigation({ isOpen, onClose, variant }: NavigationProps) {
               </li>
             )
           })}
+          <UserMenu variant="desktop" />
         </ul>
       </nav>
     )
@@ -91,6 +93,7 @@ export function Navigation({ isOpen, onClose, variant }: NavigationProps) {
             </li>
           )
         })}
+        <UserMenu variant="mobile" onNavigate={onClose} />
       </ul>
     </nav>
   )
