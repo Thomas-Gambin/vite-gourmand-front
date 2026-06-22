@@ -4,6 +4,7 @@ import { ContactPage } from './features/contact/ContactPage'
 import { HomePage } from './features/home/HomePage'
 import { LoginPage } from './features/login/LoginPage'
 import { MentionsLegalesPage } from './features/mentions-legales/MentionsLegalesPage'
+import { PolitiqueConfidentialitePage } from './features/politique-confidentialite/PolitiqueConfidentialitePage'
 import { MenusPage } from './features/menus/MenusPage'
 import { MenuDetailPage } from './features/menus/MenuDetailPage'
 import { MainLayout } from './shared/components/layout'
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="mentions-legales" element={<MentionsLegalesPage />} />
         <Route path="cgv" element={<CgvPage />} />
+        <Route path="politique-confidentialite" element={<PolitiqueConfidentialitePage />} />
       </Route>
     </Routes>
   )

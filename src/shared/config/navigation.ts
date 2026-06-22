@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { FileText, Home, LogIn, Mail, Scale, UtensilsCrossed } from 'lucide-react'
+import { FileText, Home, LogIn, Mail, Scale, Shield, UtensilsCrossed } from 'lucide-react'
 
 export type NavItem = {
   label: string
@@ -23,4 +23,5 @@ export type LegalLink = {
 export const LEGAL_LINKS: LegalLink[] = [
   { label: 'Mentions légales', to: '/mentions-legales', icon: Scale },
   { label: 'CGV', to: '/cgv', icon: FileText },
+  { label: 'Politique de confidentialité', to: '/politique-confidentialite', icon: Shield },
 ]
