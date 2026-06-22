@@ -5,6 +5,7 @@ import { HomePage } from './features/home/HomePage'
 import { LoginPage } from './features/login/LoginPage'
 import { MentionsLegalesPage } from './features/mentions-legales/MentionsLegalesPage'
 import { MenusPage } from './features/menus/MenusPage'
+import { MenuDetailPage } from './features/menus/MenuDetailPage'
 import { MainLayout } from './shared/components/layout'
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path="menus" element={<MenusPage />} />
+        <Route path="menus/:id" element={<MenuDetailPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="mentions-legales" element={<MentionsLegalesPage />} />

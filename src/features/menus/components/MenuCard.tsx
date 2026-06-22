@@ -2,16 +2,12 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Users, UtensilsCrossed } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Menu } from '../types/menu'
+import { formatPrice } from '../utils/formatPrice'
 
 type MenuCardProps = {
   menu: Menu
   index?: number
 }
-
-const priceFormatter = new Intl.NumberFormat('fr-FR', {
-  style: 'currency',
-  currency: 'EUR',
-})
 
 export function MenuCard({ menu, index = 0 }: MenuCardProps) {
   const prefersReducedMotion = useReducedMotion()
@@ -29,9 +25,9 @@ export function MenuCard({ menu, index = 0 }: MenuCardProps) {
       }}
       whileHover={prefersReducedMotion ? undefined : { y: -4 }}
     >
-      {menu.imageUrl ? (
+      {menu.images[0] ? (
         <img
-          src={menu.imageUrl}
+          src={menu.images[0]}
           alt={menu.title}
           className="aspect-[16/10] w-full object-cover"
         />
@@ -72,7 +68,7 @@ export function MenuCard({ menu, index = 0 }: MenuCardProps) {
           <div className="flex items-baseline justify-between gap-3">
             <dt className="text-sm text-text-muted">Prix par personne</dt>
             <dd className="text-lg font-semibold text-text">
-              {priceFormatter.format(menu.price)}
+              {formatPrice(menu.price)}
             </dd>
           </div>
         </dl>
