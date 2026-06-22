@@ -1,7 +1,9 @@
 import { Route, Routes } from 'react-router-dom'
 import { ConfirmEmailPage } from './features/auth/ConfirmEmailPage'
+import { ForgotPasswordPage } from './features/auth/ForgotPasswordPage'
 import { RegisterPage } from './features/auth/RegisterPage'
 import { RegisterSuccessPage } from './features/auth/RegisterSuccessPage'
+import { ResetPasswordPage } from './features/auth/ResetPasswordPage'
 import { CgvPage } from './features/cgv/CgvPage'
 import { ContactPage } from './features/contact/ContactPage'
 import { HomePage } from './features/home/HomePage'
@@ -22,6 +24,8 @@ export default function App() {
         <Route path="menus/:id" element={<MenuDetailPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="profil" element={<ProfilePage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="register-success" element={<RegisterSuccessPage />} />
