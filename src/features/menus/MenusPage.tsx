@@ -1,14 +1,23 @@
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ScrollReveal } from '../../shared/components/motion/ScrollReveal'
+import { MenusFilters } from './components/MenusFilters'
 import { MenusGrid } from './components/MenusGrid'
 import { getMenus } from './services/menusService'
 import type { Menu } from './types/menu'
+import { EMPTY_MENU_FILTERS, type MenuFilters } from './types/menuFilters'
+import { filterMenus } from './utils/filterMenus'
 
 export function MenusPage() {
-  const [menus, setMenus] = useState<Menu[]>([])
+  const [allMenus, setAllMenus] = useState<Menu[]>([])
+  const [filters, setFilters] = useState<MenuFilters>(EMPTY_MENU_FILTERS)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const filteredMenus = useMemo(
+    () => filterMenus(allMenus, filters),
+    [allMenus, filters],
+  )
 
   useEffect(() => {
     let isMounted = true
@@ -16,7 +25,7 @@ export function MenusPage() {
     getMenus()
       .then((data) => {
         if (isMounted) {
-          setMenus(data)
+          setAllMenus(data)
         }
       })
       .catch(() => {
@@ -34,6 +43,10 @@ export function MenusPage() {
       isMounted = false
     }
   }, [])
+
+  const handleResetFilters = () => {
+    setFilters(EMPTY_MENU_FILTERS)
+  }
 
   return (
     <section aria-labelledby="menus-title">
@@ -74,14 +87,42 @@ export function MenusPage() {
             {error}
           </p>
         </ScrollReveal>
-      ) : menus.length === 0 ? (
+      ) : allMenus.length === 0 ? (
         <ScrollReveal className="mt-12">
           <p className="rounded-2xl border border-dashed border-border bg-surface-muted px-6 py-10 text-center text-sm text-text-muted">
             Aucun menu disponible pour le moment.
           </p>
         </ScrollReveal>
       ) : (
-        <MenusGrid menus={menus} />
+        <>
+          <ScrollReveal>
+            <MenusFilters
+              filters={filters}
+              onChange={setFilters}
+              onReset={handleResetFilters}
+              resultCount={filteredMenus.length}
+            />
+          </ScrollReveal>
+
+          {filteredMenus.length > 0 ? (
+            <MenusGrid menus={filteredMenus} />
+          ) : (
+            <ScrollReveal className="mt-12">
+              <div className="rounded-2xl border border-dashed border-border bg-surface-muted px-6 py-10 text-center">
+                <p className="text-sm text-text-muted">
+                  Aucun menu ne correspond à votre recherche.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="mt-5 inline-flex items-center justify-center rounded-full border border-border/80 bg-surface-elevated px-6 py-3 text-sm font-medium text-text transition hover:border-brand/30 hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+                >
+                  Réinitialiser les filtres
+                </button>
+              </div>
+            </ScrollReveal>
+          )}
+        </>
       )}
     </section>
   )

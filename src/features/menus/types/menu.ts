@@ -5,6 +5,6 @@ export type Menu = {
   price: number
   minimumPeople: number
   imageUrl?: string
-  theme?: string
-  diet?: string
+  theme: string
+  diet: string
 }

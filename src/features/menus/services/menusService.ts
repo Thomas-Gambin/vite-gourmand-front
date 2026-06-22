@@ -1,4 +1,6 @@
 import type { Menu } from '../types/menu'
+import type { MenuFilters } from '../types/menuFilters'
+import { filterMenus } from '../utils/filterMenus'
 
 const mockedMenus: Menu[] = [
   {
@@ -30,6 +32,26 @@ const mockedMenus: Menu[] = [
     theme: 'Événement',
     diet: 'Végétarien',
   },
+  {
+    id: 4,
+    title: 'Menu de Pâques',
+    shortDescription:
+      'Des saveurs printanières pour célébrer Pâques en famille ou entre amis.',
+    price: 30,
+    minimumPeople: 10,
+    theme: 'Pâques',
+    diet: 'Classique',
+  },
+  {
+    id: 5,
+    title: 'Menu végan',
+    shortDescription:
+      'Une carte 100 % végétale, créative et savoureuse pour tous vos événements.',
+    price: 32,
+    minimumPeople: 8,
+    theme: 'Événement',
+    diet: 'Végan',
+  },
 ]
 
 export async function getMenus(): Promise<Menu[]> {
@@ -38,4 +60,20 @@ export async function getMenus(): Promise<Menu[]> {
   // if (!response.ok) throw new Error('Impossible de charger les menus')
   // return response.json()
   return mockedMenus
+}
+
+export async function getFilteredMenus(filters: MenuFilters): Promise<Menu[]> {
+  // TODO: remplacer par un appel API vers le back Symfony
+  // import { menuFiltersToQueryParams } from '../utils/menuFiltersToQueryParams'
+  // const params = menuFiltersToQueryParams(filters)
+  // const query = params.toString()
+  // const url = query
+  //   ? `${import.meta.env.VITE_API_BASE_URL}/menus?${query}`
+  //   : `${import.meta.env.VITE_API_BASE_URL}/menus`
+  // const response = await fetch(url)
+  // if (!response.ok) throw new Error('Impossible de charger les menus')
+  // return response.json()
+
+  const menus = await getMenus()
+  return filterMenus(menus, filters)
 }
