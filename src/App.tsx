@@ -13,7 +13,9 @@ import { PolitiqueConfidentialitePage } from './features/politique-confidentiali
 import { ProfilePage } from './features/profile/ProfilePage'
 import { MenusPage } from './features/menus/MenusPage'
 import { MenuDetailPage } from './features/menus/MenuDetailPage'
+import { CommandePage } from './features/commande/CommandePage'
 import { MainLayout } from './shared/components/layout'
+import { ProtectedRoute } from './shared/components/auth/ProtectedRoute'
 
 export default function App() {
   return (
@@ -22,6 +24,14 @@ export default function App() {
         <Route index element={<HomePage />} />
         <Route path="menus" element={<MenusPage />} />
         <Route path="menus/:id" element={<MenuDetailPage />} />
+        <Route
+          path="commande/:menuId"
+          element={
+            <ProtectedRoute>
+              <CommandePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="contact" element={<ContactPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
