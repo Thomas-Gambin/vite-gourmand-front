@@ -11,19 +11,24 @@ export type CreateCommandePayload = {
 
 export type PreviewCommandePayload = {
   menuId: number
+  adressePrestation: string
   villePrestation: string
+  codePostalPrestation?: string
   nombrePersonne: number
 }
 
 export type OrderPricePreview = {
   prixParPersonne: string
   nombrePersonne: number
+  nombrePersonneMinimum: number
   sousTotal: string
   remise: string
   prixMenu: string
   prixLivraison: string
   total: string
   reductionApplied: boolean
+  villePrestation: string
+  distanceLivraisonKm: string | null
 }
 
 export type CreatedCommande = {

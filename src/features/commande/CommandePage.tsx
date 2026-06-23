@@ -151,7 +151,9 @@ export function CommandePage() {
 
   const { preview, isLoading: isPreviewLoading, error: previewError } = useOrderPreview({
     menuId: menu?.id ?? null,
+    adressePrestation: formData.adressePrestation,
     villePrestation: formData.villePrestation,
+    codePostalPrestation: formData.codePostalPrestation,
     nombrePersonne,
     enabled: step !== 'confirmation',
   })

@@ -115,6 +115,12 @@ export function OrderSummary({
               <dt className="text-text-muted">Prix menu</dt>
               <dd className="font-medium text-text">{formatEuro(preview.prixMenu)}</dd>
             </div>
+            {preview.distanceLivraisonKm && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-text-muted">Distance</dt>
+                <dd className="font-medium text-text">{preview.distanceLivraisonKm} km</dd>
+              </div>
+            )}
             <div className="flex justify-between gap-4">
               <dt className="text-text-muted">Livraison</dt>
               <dd className="font-medium text-text">{formatEuro(preview.prixLivraison)}</dd>

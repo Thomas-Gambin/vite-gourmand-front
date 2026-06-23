@@ -4,14 +4,18 @@ import type { OrderPricePreview } from '../types/commande'
 
 type UseOrderPreviewParams = {
   menuId: number | null
+  adressePrestation: string
   villePrestation: string
+  codePostalPrestation: string
   nombrePersonne: number | null
   enabled?: boolean
 }
 
 export function useOrderPreview({
   menuId,
+  adressePrestation,
   villePrestation,
+  codePostalPrestation,
   nombrePersonne,
   enabled = true,
 }: UseOrderPreviewParams) {
@@ -26,9 +30,11 @@ export function useOrderPreview({
       return
     }
 
+    const trimmedAddress = adressePrestation.trim()
     const trimmedCity = villePrestation.trim()
-    if (!trimmedCity) {
+    if (!trimmedAddress || !trimmedCity) {
       setPreview(null)
+      setError(null)
       return
     }
 
@@ -36,9 +42,13 @@ export function useOrderPreview({
       setIsLoading(true)
       setError(null)
 
+      const trimmedPostalCode = codePostalPrestation.trim()
+
       void previewCommande({
         menuId,
+        adressePrestation: trimmedAddress,
         villePrestation: trimmedCity,
+        codePostalPrestation: trimmedPostalCode || undefined,
         nombrePersonne,
       })
         .then((data) => {
@@ -65,7 +75,7 @@ export function useOrderPreview({
     return () => {
       window.clearTimeout(timeoutId)
     }
-  }, [enabled, menuId, villePrestation, nombrePersonne])
+  }, [enabled, menuId, adressePrestation, villePrestation, codePostalPrestation, nombrePersonne])
 
   return { preview, isLoading, error }
 }
