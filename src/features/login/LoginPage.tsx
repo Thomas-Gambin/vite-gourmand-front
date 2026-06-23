@@ -17,7 +17,10 @@ export function LoginPage() {
   const navigate = useNavigate()
   const { login, isAuthenticated, isLoading } = useAuth()
   const prefilledEmail = (location.state as { email?: string } | null)?.email ?? ''
-  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
+  const fromLocation = (location.state as { from?: { pathname?: string; search?: string } } | null)?.from
+  const redirectTo = fromLocation
+    ? `${fromLocation.pathname ?? '/'}${fromLocation.search ?? ''}`
+    : '/'
 
   const [email, setEmail] = useState(prefilledEmail)
   const [password, setPassword] = useState('')
@@ -26,9 +29,9 @@ export function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      navigate(fromPath ?? '/', { replace: true })
+      navigate(redirectTo, { replace: true })
     }
-  }, [isLoading, isAuthenticated, navigate, fromPath])
+  }, [isLoading, isAuthenticated, navigate, redirectTo])
 
   function validate(): FieldErrors {
     const next: FieldErrors = {}
@@ -51,7 +54,7 @@ export function LoginPage() {
     setErrors({})
     try {
       await login({ email: email.trim().toLowerCase(), password })
-      navigate(fromPath ?? '/', { replace: true })
+      navigate(redirectTo, { replace: true })
     } catch (error) {
       if (error instanceof Error) {
         try {

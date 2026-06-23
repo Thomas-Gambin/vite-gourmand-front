@@ -3,6 +3,10 @@ export type AuthUser = {
   email: string
   nom: string
   prenom: string
+  telephone: string
+  adressePostale: string
+  ville: string
+  pays: string
   roles: string[]
   isVerified: boolean
 }

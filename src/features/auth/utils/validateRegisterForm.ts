@@ -10,6 +10,8 @@ export type RegisterFormData = {
   adressePostale: string
 }
 
+import { INVALID_PHONE_MESSAGE, isValidFrenchPhone } from '../../../shared/utils/validatePhone'
+
 export type RegisterFieldErrors = Partial<Record<keyof RegisterFormData | 'form', string>>
 
 function isValidEmail(email: string) {
@@ -47,7 +49,11 @@ export function validateRegisterForm(data: RegisterFormData): RegisterFieldError
     errors.confirmPassword = 'Les mots de passe ne correspondent pas.'
   }
 
-  if (!data.telephone.trim()) errors.telephone = 'Le téléphone est obligatoire.'
+  if (!data.telephone.trim()) {
+    errors.telephone = 'Le téléphone est obligatoire.'
+  } else if (!isValidFrenchPhone(data.telephone)) {
+    errors.telephone = INVALID_PHONE_MESSAGE
+  }
   if (!data.ville.trim()) errors.ville = 'La ville est obligatoire.'
   if (!data.pays.trim()) errors.pays = 'Le pays est obligatoire.'
   if (!data.adressePostale.trim()) errors.adressePostale = "L'adresse postale est obligatoire."

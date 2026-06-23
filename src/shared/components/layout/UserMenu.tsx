@@ -113,7 +113,7 @@ export function UserMenu({ variant, onNavigate }: UserMenuProps) {
         </li>
         <li>
           <Link
-            to="/profil"
+            to="/mon-compte"
             onClick={handleNavClick}
             className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-text-muted transition-colors hover:bg-brand-muted hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
           >
@@ -176,7 +176,7 @@ export function UserMenu({ variant, onNavigate }: UserMenuProps) {
               aria-label="Menu compte utilisateur"
               className="min-w-[11rem] overflow-hidden rounded-xl border border-border/80 bg-surface-elevated p-1.5 shadow-lg"
             >
-              <Link to="/profil" role="menuitem" onClick={handleNavClick} className={menuItemClassName}>
+              <Link to="/mon-compte" role="menuitem" onClick={handleNavClick} className={menuItemClassName}>
                 <User className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
                 Mon profil
               </Link>
