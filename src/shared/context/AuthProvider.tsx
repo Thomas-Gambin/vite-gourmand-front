@@ -62,6 +62,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return ok ? getStoredUser() : null
   }, [clearUser, handleRefreshAndLoadUser])
 
+  const updateUser = useCallback(
+    (nextUser: AuthUser) => {
+      const { accessToken, refreshToken } = loadAuthSession()
+      if (accessToken && refreshToken) {
+        applySession(nextUser, accessToken, refreshToken)
+      } else {
+        setUser(nextUser)
+      }
+    },
+    [applySession],
+  )
+
   useEffect(() => {
     setUnauthorizedHandler(() => {
       clearUser()
@@ -151,8 +163,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       refreshUser,
+      updateUser,
     }),
-    [user, isLoading, login, logout, refreshUser],
+    [user, isLoading, login, logout, refreshUser, updateUser],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

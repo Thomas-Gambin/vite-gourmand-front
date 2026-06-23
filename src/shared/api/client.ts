@@ -167,3 +167,28 @@ export async function postJson<TResponse, TBody extends Record<string, unknown>>
 
   return data as TResponse
 }
+
+export async function patchJson<TResponse, TBody extends Record<string, unknown>>(
+  path: string,
+  body: TBody,
+  options: ApiFetchOptions = {},
+): Promise<TResponse> {
+  const res = await apiFetch(
+    path,
+    {
+      method: 'PATCH',
+      headers: { Accept: 'application/json' },
+      body: JSON.stringify(body),
+    },
+    options,
+  )
+
+  const data = await readJsonSafe(res)
+
+  if (!res.ok) {
+    const apiError = normalizeApiError(data)
+    throw new Error(JSON.stringify(apiError))
+  }
+
+  return data as TResponse
+}

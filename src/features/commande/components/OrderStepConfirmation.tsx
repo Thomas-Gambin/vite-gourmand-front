@@ -45,7 +45,7 @@ export function OrderStepConfirmation({ commande }: OrderStepConfirmationProps) 
       </dl>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-        <Link to="/profil" className={secondaryButtonClassName}>
+        <Link to="/mon-compte" className={secondaryButtonClassName}>
           Mes commandes
         </Link>
         <Link to="/menus" className={primaryButtonClassName}>
