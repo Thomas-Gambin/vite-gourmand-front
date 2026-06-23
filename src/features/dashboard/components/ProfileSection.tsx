@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { AuthUser } from '../../auth/types/user'
+import { ResendVerificationForm } from '../../auth/components/ResendVerificationForm'
 import { updateProfile } from '../api/profileApi'
 import type { UpdateProfilePayload } from '../types/dashboard'
 import { parseApiError } from '../utils/parseApiError'
@@ -7,6 +8,9 @@ import { validateProfileForm, type ProfileFormErrors } from '../utils/validatePr
 
 const inputClassName =
   'mt-2 w-full rounded-xl border border-border/80 bg-surface px-4 py-3.5 text-sm text-text transition focus-visible:border-brand/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2'
+
+const readOnlyInputClassName =
+  'mt-2 w-full cursor-not-allowed rounded-xl border border-border/60 bg-surface-muted px-4 py-3.5 text-sm text-text-muted'
 
 const primaryButtonClassName =
   'inline-flex cursor-pointer items-center justify-center rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition hover:-translate-y-0.5 hover:bg-brand-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60'
@@ -16,31 +20,26 @@ type ProfileSectionProps = {
   onProfileUpdated: (user: AuthUser) => void
 }
 
-export function ProfileSection({ user, onProfileUpdated }: ProfileSectionProps) {
-  const [formData, setFormData] = useState<UpdateProfilePayload>({
+function toFormData(user: AuthUser): UpdateProfilePayload {
+  return {
     nom: user.nom,
     prenom: user.prenom,
-    email: user.email,
     telephone: user.telephone,
     adressePostale: user.adressePostale,
     ville: user.ville,
     pays: user.pays,
-  })
+  }
+}
+
+export function ProfileSection({ user, onProfileUpdated }: ProfileSectionProps) {
+  const [formData, setFormData] = useState<UpdateProfilePayload>(() => toFormData(user))
   const [errors, setErrors] = useState<ProfileFormErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    setFormData({
-      nom: user.nom,
-      prenom: user.prenom,
-      email: user.email,
-      telephone: user.telephone,
-      adressePostale: user.adressePostale,
-      ville: user.ville,
-      pays: user.pays,
-    })
+    setFormData(toFormData(user))
   }, [user])
 
   function handleChange(field: keyof UpdateProfilePayload, value: string) {
@@ -83,6 +82,16 @@ export function ProfileSection({ user, onProfileUpdated }: ProfileSectionProps) 
       <h2 id="profile-section-title" className="mt-2 text-xl font-bold text-text">
         Mes informations personnelles
       </h2>
+
+      {!user.isVerified && (
+        <div className="mt-4 space-y-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-900">
+          <p role="status">
+            Votre adresse email n&apos;est pas encore confirmée. Consultez votre boîte mail (et vos spams) ou
+            renvoyez un email de confirmation.
+          </p>
+          <ResendVerificationForm initialEmail={user.email} />
+        </div>
+      )}
 
       {success && (
         <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
@@ -140,16 +149,15 @@ export function ProfileSection({ user, onProfileUpdated }: ProfileSectionProps) 
           <input
             id="profile-email"
             type="email"
-            className={`${inputClassName} ${errors.email ? 'border-rose-300' : ''}`}
-            value={formData.email}
-            onChange={(e) => handleChange('email', e.target.value)}
-            autoComplete="email"
+            className={readOnlyInputClassName}
+            value={user.email}
+            readOnly
+            disabled
+            aria-describedby="profile-email-hint"
           />
-          {errors.email && (
-            <p className="mt-1.5 text-sm text-rose-700" role="alert">
-              {errors.email}
-            </p>
-          )}
+          <p id="profile-email-hint" className="mt-1.5 text-sm text-text-muted">
+            L&apos;adresse email ne peut pas être modifiée depuis cet espace.
+          </p>
         </div>
 
         <div>
@@ -227,7 +235,17 @@ export function ProfileSection({ user, onProfileUpdated }: ProfileSectionProps) 
         </div>
 
         <button type="submit" className={primaryButtonClassName} disabled={isSubmitting}>
-          {isSubmitting ? 'Enregistrement…' : 'Enregistrer les modifications'}
+          {isSubmitting ? (
+            <>
+              <span
+                className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                aria-hidden
+              />
+              Enregistrement…
+            </>
+          ) : (
+            'Enregistrer les modifications'
+          )}
         </button>
       </form>
     </section>

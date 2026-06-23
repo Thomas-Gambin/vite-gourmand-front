@@ -88,7 +88,6 @@ export type AvailableReview = {
 export type UpdateProfilePayload = {
   nom: string
   prenom: string
-  email: string
   telephone: string
   adressePostale: string
   ville: string
