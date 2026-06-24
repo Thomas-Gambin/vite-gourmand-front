@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircle2, Sparkles } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AuthUser } from '../auth/types/user'
 import { getOrderTracking } from './api/ordersApi'
@@ -26,43 +26,101 @@ const tabTransition = {
   transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const },
 }
 
+const POLLING_INTERVAL_MS = 60_000
+const TERMINAL_STATUSES = new Set(['terminee', 'annulee'])
+
+function parseOrderId(value: string | null): number | null {
+  if (value === null || value === '') return null
+  const parsed = Number.parseInt(value, 10)
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed
+}
+
 export function DashboardPage({ user, onProfileUpdated }: DashboardPageProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState<DashboardTab>(() => parseDashboardTab(searchParams.get('tab')))
-  const [trackingOrderId, setTrackingOrderId] = useState<number | null>(null)
   const [activeReviewId, setActiveReviewId] = useState<number | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [tracking, setTracking] = useState<OrderTracking | null>(null)
   const [trackingLoading, setTrackingLoading] = useState(false)
+  const [trackingRefreshing, setTrackingRefreshing] = useState(false)
   const [trackingError, setTrackingError] = useState<string | null>(null)
+  const trackingOrderId = parseOrderId(searchParams.get('orderId'))
+  const isTrackingView = activeTab === 'commandes' && trackingOrderId !== null
+  const loadTrackingRef = useRef<(orderId: number, options?: { silent?: boolean }) => Promise<void>>(async () => {})
 
-  const loadTracking = useCallback(async (orderId: number) => {
-    setTrackingLoading(true)
-    setTrackingError(null)
-    setTracking(null)
+  const loadTracking = useCallback(async (orderId: number, options?: { silent?: boolean }) => {
+    const silent = options?.silent ?? false
+    if (silent) {
+      setTrackingRefreshing(true)
+    } else {
+      setTrackingLoading(true)
+      setTrackingError(null)
+      setTracking(null)
+    }
+
     try {
       const response = await getOrderTracking(orderId)
       setTracking(response.tracking)
+      setTrackingError(null)
     } catch (err) {
+      if (!silent) {
+        setTracking(null)
+      }
       setTrackingError(parseApiError(err).message)
     } finally {
-      setTrackingLoading(false)
+      if (silent) {
+        setTrackingRefreshing(false)
+      } else {
+        setTrackingLoading(false)
+      }
     }
   }, [])
+
+  loadTrackingRef.current = loadTracking
+
+  // Redirige les anciens liens ?tab=suivi vers ?tab=commandes
+  useEffect(() => {
+    if (searchParams.get('tab') !== 'suivi') return
+
+    const orderId = searchParams.get('orderId')
+    if (orderId) {
+      setSearchParams({ tab: 'commandes', orderId }, { replace: true })
+      return
+    }
+
+    setSearchParams({ tab: 'commandes' }, { replace: true })
+  }, [searchParams, setSearchParams])
 
   useEffect(() => {
     setActiveTab(parseDashboardTab(searchParams.get('tab')))
   }, [searchParams])
 
   useEffect(() => {
-    if (activeTab === 'suivi' && trackingOrderId !== null) {
-      void loadTracking(trackingOrderId)
+    if (!isTrackingView || trackingOrderId === null) {
+      return
     }
-  }, [activeTab, trackingOrderId, loadTracking])
+
+    void loadTracking(trackingOrderId)
+  }, [isTrackingView, trackingOrderId, loadTracking])
+
+  useEffect(() => {
+    if (!isTrackingView || trackingOrderId === null) {
+      return
+    }
+
+    if (tracking !== null && TERMINAL_STATUSES.has(tracking.statutActuel)) {
+      return
+    }
+
+    const intervalId = window.setInterval(() => {
+      void loadTrackingRef.current(trackingOrderId, { silent: true })
+    }, POLLING_INTERVAL_MS)
+
+    return () => window.clearInterval(intervalId)
+  }, [isTrackingView, trackingOrderId, tracking?.statutActuel])
 
   function handleTrackOrder(orderId: number) {
-    setTrackingOrderId(orderId)
-    handleTabChange('suivi')
+    setSearchParams({ tab: 'commandes', orderId: String(orderId) })
   }
 
   function handleReviewOrder(orderId: number) {
@@ -85,6 +143,24 @@ export function DashboardPage({ user, onProfileUpdated }: DashboardPageProps) {
 
     setSearchParams({ tab })
   }
+
+  function handleBackToOrders() {
+    setTracking(null)
+    setTrackingError(null)
+    setSearchParams({ tab: 'commandes' })
+  }
+
+  function handleRefreshTracking() {
+    if (trackingOrderId === null) return
+    void loadTracking(trackingOrderId, { silent: true })
+  }
+
+  const contentKey =
+    activeTab === 'commandes'
+      ? trackingOrderId !== null
+        ? `commandes-tracking-${trackingOrderId}`
+        : 'commandes'
+      : activeTab
 
   const initials = getUserInitials(user.prenom, user.nom)
 
@@ -151,12 +227,12 @@ export function DashboardPage({ user, onProfileUpdated }: DashboardPageProps) {
 
           <div className="min-w-0">
             <AnimatePresence mode="wait">
-              <motion.div key={activeTab} {...tabTransition}>
+              <motion.div key={contentKey} {...tabTransition}>
                 {activeTab === 'profil' && (
                   <ProfileSection user={user} onProfileUpdated={onProfileUpdated} />
                 )}
 
-                {activeTab === 'commandes' && (
+                {activeTab === 'commandes' && !isTrackingView && (
                   <OrdersSection
                     onTrackOrder={handleTrackOrder}
                     onReviewOrder={handleReviewOrder}
@@ -164,12 +240,15 @@ export function DashboardPage({ user, onProfileUpdated }: DashboardPageProps) {
                   />
                 )}
 
-                {activeTab === 'suivi' && (
+                {activeTab === 'commandes' && isTrackingView && (
                   <div className={dashboardPanelClassName}>
                     <OrderTrackingView
                       tracking={tracking}
                       isLoading={trackingLoading}
+                      isRefreshing={trackingRefreshing}
                       error={trackingError}
+                      onRefresh={handleRefreshTracking}
+                      onBack={handleBackToOrders}
                     />
                   </div>
                 )}

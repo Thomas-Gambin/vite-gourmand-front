@@ -45,3 +45,36 @@ export function formatDateTimeFr(isoDate: string): string {
 export function formatPrice(value: string): string {
   return `${Number.parseFloat(value).toFixed(2).replace('.', ',')} €`
 }
+
+/** Étapes du parcours livraison (hors en_attente et annulee). */
+export const TRACKING_PROGRESS_STATUSES: OrderStatus[] = [
+  'accepte',
+  'en_preparation',
+  'en_cours_de_livraison',
+  'livre',
+  'en_attente_retour_materiel',
+  'terminee',
+]
+
+export function getTrackingProgressPercent(statut: OrderStatus): number {
+  if (statut === 'annulee') return 0
+  const index = TRACKING_PROGRESS_STATUSES.indexOf(statut)
+  if (index < 0) return 0
+  if (TRACKING_PROGRESS_STATUSES.length <= 1) return 100
+  return Math.round((index / (TRACKING_PROGRESS_STATUSES.length - 1)) * 100)
+}
+
+export function formatTrackingDateParts(isoDate: string): { date: string; time: string } {
+  const date = new Date(isoDate)
+  return {
+    date: date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }),
+    time: date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+  }
+}

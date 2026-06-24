@@ -1,21 +1,12 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Package, RefreshCw } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { cancelMyOrder, getMyOrder, getMyOrders } from '../api/ordersApi'
-import { dashboardPanelClassName } from '../dashboardUi'
+import { dashboardPanelClassName, dashboardSecondaryButtonClassName } from '../dashboardUi'
 import type { UserOrderListItem } from '../types/dashboard'
-import { formatDateFr, formatDateTimeFr, formatPrice } from '../utils/orderStatus'
 import { parseApiError } from '../utils/parseApiError'
+import { OrderCard, OrdersEmptyState, OrdersListSkeleton } from './OrderCard'
 import { OrderDetailModal } from './OrderDetailModal'
 import { OrderEditModal } from './OrderEditModal'
-import { StatusBadge } from './StatusBadge'
-
-const primaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-
-const secondaryButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center rounded-full border border-border bg-surface-elevated px-4 py-2 text-xs font-medium text-text transition hover:border-brand/30 hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-
-const dangerButtonClassName =
-  'inline-flex cursor-pointer items-center justify-center rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-medium text-rose-800 transition hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
 
 type OrdersSectionProps = {
   onTrackOrder: (orderId: number) => void
@@ -23,10 +14,31 @@ type OrdersSectionProps = {
   refreshKey?: number
 }
 
+type OrderFilter = 'all' | 'active' | 'done' | 'cancelled'
+
+const filterOptions: Array<{ id: OrderFilter; label: string }> = [
+  { id: 'all', label: 'Toutes' },
+  { id: 'active', label: 'En cours' },
+  { id: 'done', label: 'Terminées' },
+  { id: 'cancelled', label: 'Annulées' },
+]
+
+function matchesFilter(order: UserOrderListItem, filter: OrderFilter): boolean {
+  if (filter === 'all') return true
+  if (filter === 'active') return order.statut !== 'terminee' && order.statut !== 'annulee'
+  if (filter === 'done') return order.statut === 'terminee'
+  return order.statut === 'annulee'
+}
+
+function countByFilter(orders: UserOrderListItem[], filter: OrderFilter): number {
+  return orders.filter((order) => matchesFilter(order, filter)).length
+}
+
 export function OrdersSection({ onTrackOrder, onReviewOrder, refreshKey = 0 }: OrdersSectionProps) {
   const [orders, setOrders] = useState<UserOrderListItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [filter, setFilter] = useState<OrderFilter>('all')
   const [detailId, setDetailId] = useState<number | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState<string | null>(null)
@@ -50,6 +62,13 @@ export function OrdersSection({ onTrackOrder, onReviewOrder, refreshKey = 0 }: O
   useEffect(() => {
     void loadOrders()
   }, [loadOrders, refreshKey])
+
+  const filteredOrders = useMemo(
+    () => orders.filter((order) => matchesFilter(order, filter)),
+    [orders, filter],
+  )
+
+  const activeCount = useMemo(() => countByFilter(orders, 'active'), [orders])
 
   async function openDetail(id: number) {
     setDetailId(id)
@@ -90,12 +109,83 @@ export function OrdersSection({ onTrackOrder, onReviewOrder, refreshKey = 0 }: O
 
   return (
     <section aria-labelledby="orders-section-title" className={dashboardPanelClassName}>
-      <h2 id="orders-section-title" className="text-xl font-semibold tracking-tight text-text">
-        Mes commandes
-      </h2>
-      <p className="mt-1.5 text-sm text-text-muted">
-        Retrouvez l&apos;historique de vos commandes, suivez leur avancement ou modifiez-les si besoin.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 id="orders-section-title" className="text-xl font-semibold tracking-tight text-text">
+            Mes commandes
+          </h2>
+          <p className="mt-1.5 max-w-xl text-sm text-text-muted">
+            Retrouvez l&apos;historique de vos commandes, suivez leur avancement ou modifiez-les si besoin.
+          </p>
+        </div>
+
+        {!isLoading && orders.length > 0 && (
+          <button
+            type="button"
+            className={dashboardSecondaryButtonClassName}
+            onClick={() => void loadOrders()}
+            aria-label="Actualiser la liste des commandes"
+          >
+            <RefreshCw className="h-4 w-4" aria-hidden />
+            Actualiser
+          </button>
+        )}
+      </div>
+
+      {!isLoading && orders.length > 0 && (
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-border/50 bg-surface-muted/40 px-4 py-3">
+            <p className="text-xs font-medium text-text-muted">Total</p>
+            <p className="mt-1 text-2xl font-semibold text-text">{orders.length}</p>
+          </div>
+          <div className="rounded-2xl border border-brand/20 bg-brand-muted/30 px-4 py-3">
+            <p className="text-xs font-medium text-brand">En cours</p>
+            <p className="mt-1 text-2xl font-semibold text-brand">{activeCount}</p>
+          </div>
+          <div className="rounded-2xl border border-border/50 bg-surface-muted/40 px-4 py-3">
+            <p className="text-xs font-medium text-text-muted">Terminées</p>
+            <p className="mt-1 text-2xl font-semibold text-text">{countByFilter(orders, 'done')}</p>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && orders.length > 0 && (
+        <div
+          className="mt-5 flex flex-wrap gap-2"
+          role="tablist"
+          aria-label="Filtrer les commandes"
+        >
+          {filterOptions.map((option) => {
+            const count = countByFilter(orders, option.id)
+            const isActive = filter === option.id
+            return (
+              <button
+                key={option.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setFilter(option.id)}
+                className={[
+                  'inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
+                  isActive
+                    ? 'bg-brand text-white shadow-sm shadow-brand/25'
+                    : 'border border-border/60 bg-surface text-text-muted hover:border-brand/25 hover:text-brand',
+                ].join(' ')}
+              >
+                {option.label}
+                <span
+                  className={[
+                    'rounded-full px-1.5 py-0.5 text-[10px] font-bold',
+                    isActive ? 'bg-white/20 text-white' : 'bg-surface-muted text-text-muted',
+                  ].join(' ')}
+                >
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {actionError && (
         <p className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
@@ -103,11 +193,7 @@ export function OrdersSection({ onTrackOrder, onReviewOrder, refreshKey = 0 }: O
         </p>
       )}
 
-      {isLoading && (
-        <p className="mt-6 text-sm text-text-muted" role="status">
-          Chargement des commandes…
-        </p>
-      )}
+      {isLoading && <OrdersListSkeleton />}
 
       {error && (
         <p className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
@@ -115,102 +201,34 @@ export function OrdersSection({ onTrackOrder, onReviewOrder, refreshKey = 0 }: O
         </p>
       )}
 
-      {!isLoading && !error && orders.length === 0 && (
+      {!isLoading && !error && orders.length === 0 && <OrdersEmptyState />}
+
+      {!isLoading && orders.length > 0 && filteredOrders.length === 0 && (
         <div className="mt-8 rounded-2xl border border-dashed border-border/80 bg-surface-muted/50 px-6 py-10 text-center">
-          <p className="text-sm font-medium text-text">Aucune commande pour le moment</p>
-          <p className="mt-1 text-sm text-text-muted">Parcourez nos menus pour passer votre première commande.</p>
+          <Package className="mx-auto h-9 w-9 text-text-muted/50" aria-hidden strokeWidth={1.5} />
+          <p className="mt-3 text-sm font-medium text-text">Aucune commande dans cette catégorie</p>
+          <button
+            type="button"
+            className={`${dashboardSecondaryButtonClassName} mt-4`}
+            onClick={() => setFilter('all')}
+          >
+            Voir toutes les commandes
+          </button>
         </div>
       )}
 
-      {!isLoading && orders.length > 0 && (
-        <ul className="mt-8 space-y-4">
-          {orders.map((order) => (
-            <li
-              key={order.id}
-              className="rounded-2xl border border-border/60 bg-surface p-5 shadow-sm transition hover:border-brand/20 hover:shadow-md sm:p-6"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-text">{order.numeroCommande}</p>
-                  <p className="mt-1 text-sm text-text-muted">{order.menuTitre}</p>
-                </div>
-                <StatusBadge statut={order.statut} />
-              </div>
-
-              <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
-                <div>
-                  <dt className="text-text-muted">Prestation</dt>
-                  <dd className="text-text">
-                    {formatDateFr(order.datePrestation)} à {order.heureLivraison}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-text-muted">Adresse</dt>
-                  <dd className="text-text">
-                    {order.adressePrestation}, {order.villePrestation}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-text-muted">Personnes</dt>
-                  <dd className="text-text">{order.nombrePersonne}</dd>
-                </div>
-                <div>
-                  <dt className="text-text-muted">Total</dt>
-                  <dd className="font-medium text-text">{formatPrice(order.total)}</dd>
-                </div>
-                <div className="sm:col-span-2">
-                  <dt className="text-text-muted">Créée le</dt>
-                  <dd className="text-text">{formatDateTimeFr(order.dateCommande)}</dd>
-                </div>
-              </dl>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button type="button" className={primaryButtonClassName} onClick={() => void openDetail(order.id)}>
-                  Voir le détail
-                </button>
-                {order.canReview && (
-                  <button
-                    type="button"
-                    className={primaryButtonClassName}
-                    onClick={() => onReviewOrder(order.id)}
-                  >
-                    Donner mon avis
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className={secondaryButtonClassName}
-                  disabled={!order.canTrack}
-                  onClick={() => onTrackOrder(order.id)}
-                  title={!order.canTrack ? 'Suivi disponible une fois la commande acceptée' : undefined}
-                >
-                  Suivi
-                </button>
-                <button
-                  type="button"
-                  className={secondaryButtonClassName}
-                  disabled={!order.canEdit}
-                  onClick={() => setEditOrder(order)}
-                  title={!order.canEdit ? 'Modification impossible après acceptation' : undefined}
-                >
-                  Modifier
-                </button>
-                <button
-                  type="button"
-                  className={dangerButtonClassName}
-                  disabled={!order.canCancel}
-                  onClick={() => void handleCancel(order)}
-                  title={!order.canCancel ? 'Annulation impossible après acceptation' : undefined}
-                >
-                  Annuler
-                </button>
-              </div>
-
-              {!order.canReview && order.statut !== 'terminee' && order.statut !== 'annulee' && (
-                <p className="mt-3 text-sm text-text-muted">
-                  Vous pourrez déposer un avis lorsque la commande sera terminée.
-                </p>
-              )}
+      {!isLoading && filteredOrders.length > 0 && (
+        <ul className="mt-6 space-y-4">
+          {filteredOrders.map((order) => (
+            <li key={order.id}>
+              <OrderCard
+                order={order}
+                onDetail={(id) => void openDetail(id)}
+                onTrack={onTrackOrder}
+                onReview={onReviewOrder}
+                onEdit={setEditOrder}
+                onCancel={(o) => void handleCancel(o)}
+              />
             </li>
           ))}
         </ul>

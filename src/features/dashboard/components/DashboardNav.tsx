@@ -1,10 +1,9 @@
-import { Package, Route, Star, User } from 'lucide-react'
+import { Package, Star, User } from 'lucide-react'
 import type { DashboardTab } from '../types/dashboard'
 
 const tabs: Array<{ id: DashboardTab; label: string; icon: typeof User }> = [
   { id: 'profil', label: 'Profil', icon: User },
   { id: 'commandes', label: 'Mes commandes', icon: Package },
-  { id: 'suivi', label: 'Suivi', icon: Route },
   { id: 'avis', label: 'Avis disponibles', icon: Star },
 ]
 
