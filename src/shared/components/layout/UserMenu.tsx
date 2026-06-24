@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { LogIn, LogOut, Package, User } from 'lucide-react'
+import { LayoutDashboard, LogIn, LogOut, Package, User } from 'lucide-react'
 import { useCallback, useEffect, useId, useRef, useState, type FocusEvent } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { getEmployeeDashboardUrl, hasEmployeeAccess } from '../../auth/roles'
 import { useOptionalAuth } from '../../hooks/useAuth'
 
 type UserMenuProps = {
@@ -103,6 +104,9 @@ export function UserMenu({ variant, onNavigate }: UserMenuProps) {
     return <ConnexionLink variant={variant} onNavigate={onNavigate} />
   }
 
+  const showEmployeeLink = hasEmployeeAccess(auth.user.roles)
+  const employeeDashboardUrl = getEmployeeDashboardUrl()
+
   if (variant === 'mobile') {
     return (
       <>
@@ -131,6 +135,20 @@ export function UserMenu({ variant, onNavigate }: UserMenuProps) {
             Mes commandes
           </Link>
         </li>
+        {showEmployeeLink ? (
+          <li>
+            <a
+              href={employeeDashboardUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleNavClick}
+              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-text-muted transition-colors hover:bg-brand-muted hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+            >
+              <LayoutDashboard className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
+              Espace employé
+            </a>
+          </li>
+        ) : null}
         <li>
           <button
             type="button"
@@ -199,6 +217,19 @@ export function UserMenu({ variant, onNavigate }: UserMenuProps) {
                 <Package className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
                 Mes commandes
               </Link>
+              {showEmployeeLink ? (
+                <a
+                  href={employeeDashboardUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  role="menuitem"
+                  onClick={handleNavClick}
+                  className={menuItemClassName}
+                >
+                  <LayoutDashboard className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
+                  Espace employé
+                </a>
+              ) : null}
               <button
                 type="button"
                 role="menuitem"
