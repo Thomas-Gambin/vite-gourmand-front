@@ -1,4 +1,5 @@
 import { Info } from 'lucide-react'
+import { menuDetailSectionClassName } from '../menuDetailUi'
 
 type MenuConditionsProps = {
   conditions: string
@@ -8,18 +9,18 @@ export function MenuConditions({ conditions }: MenuConditionsProps) {
   return (
     <section
       aria-labelledby="conditions-title"
-      className="mt-16 overflow-hidden rounded-3xl border border-brand/15 bg-gradient-to-br from-brand-muted/80 via-surface-elevated to-surface-muted p-7 shadow-sm sm:p-8"
+      className={`${menuDetailSectionClassName} overflow-hidden border-brand/20 bg-gradient-to-br from-brand-muted/50 via-surface-elevated to-surface-muted/60`}
     >
-      <div className="flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand/10">
-          <Info className="h-5 w-5 text-brand" aria-hidden="true" strokeWidth={1.75} />
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-inner">
+          <Info className="h-5 w-5" strokeWidth={1.75} aria-hidden />
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">Important</p>
-          <h2 id="conditions-title" className="mt-1 text-xl font-bold text-text sm:text-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Important</p>
+          <h2 id="conditions-title" className="mt-2 text-xl font-bold tracking-tight text-text sm:text-2xl">
             Conditions de commande
           </h2>
-          <p className="mt-4 text-sm leading-relaxed text-text-muted sm:text-base">{conditions}</p>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-text-muted sm:text-base">{conditions}</p>
         </div>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import type { Dish } from '../types/menu'
+import { menuDetailCardClassName } from '../menuDetailUi'
 
 type DishItemProps = {
   dish: Dish
@@ -6,8 +7,8 @@ type DishItemProps = {
 
 export function DishItem({ dish }: DishItemProps) {
   return (
-    <li className="rounded-2xl border border-border/50 bg-surface-elevated p-5 shadow-sm transition hover:border-brand/20 hover:shadow-md">
-      <p className="font-semibold text-text">{dish.name}</p>
+    <li className={menuDetailCardClassName}>
+      <p className="font-semibold tracking-tight text-text">{dish.name}</p>
       {dish.description ? (
         <p className="mt-2 text-sm leading-relaxed text-text-muted">{dish.description}</p>
       ) : null}
@@ -17,14 +18,14 @@ export function DishItem({ dish }: DishItemProps) {
             {dish.allergens.map((allergen) => (
               <li
                 key={allergen.id}
-                className="rounded-full border border-border/70 bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-text-muted"
+                className="rounded-full bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-text-muted"
               >
                 {allergen.name}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-xs text-text-muted">Aucun allergène renseigné</p>
+          <p className="text-xs text-text-muted/80">Aucun allergène renseigné</p>
         )}
       </div>
     </li>

@@ -1,33 +1,10 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { Star } from 'lucide-react'
+import { StarRating } from '../../../shared/components/StarRating'
 import type { Review } from '../types/review'
 
 type ReviewCardProps = {
   review: Review
   index?: number
-}
-
-function StarRating({ rating }: { rating: number }) {
-  const clampedRating = Math.min(5, Math.max(1, Math.round(rating)))
-
-  return (
-    <div className="flex items-center gap-2" aria-label={`Note : ${clampedRating} sur 5`}>
-      <span className="flex gap-0.5" aria-hidden="true">
-        {Array.from({ length: 5 }, (_, starIndex) => {
-          const isFilled = starIndex < clampedRating
-
-          return (
-            <Star
-              key={starIndex}
-              className={`h-4 w-4 ${isFilled ? 'fill-brand text-brand' : 'text-border'}`}
-              strokeWidth={1.75}
-            />
-          )
-        })}
-      </span>
-      <span className="text-sm font-medium text-text">{clampedRating}/5</span>
-    </div>
-  )
 }
 
 export function ReviewCard({ review, index = 0 }: ReviewCardProps) {

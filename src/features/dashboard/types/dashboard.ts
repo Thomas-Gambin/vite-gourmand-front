@@ -72,6 +72,7 @@ export type OrderTracking = {
   numeroCommande: string
   statutActuel: OrderStatus
   etapes: Array<{
+    id: number
     statut: OrderStatus
     dateModification: string
     heureModification: string
@@ -109,4 +110,17 @@ export type CreateReviewPayload = {
   commentaire: string
 }
 
-export type DashboardTab = 'profil' | 'commandes' | 'suivi' | 'avis'
+export type DashboardTab = 'profil' | 'commandes' | 'avis'
+
+export function parseDashboardTab(value: string | null): DashboardTab {
+  if (value === 'commandes' || value === 'avis') {
+    return value
+  }
+
+  // Rétrocompatibilité : anciens liens ?tab=suivi
+  if (value === 'suivi') {
+    return 'commandes'
+  }
+
+  return 'profil'
+}
