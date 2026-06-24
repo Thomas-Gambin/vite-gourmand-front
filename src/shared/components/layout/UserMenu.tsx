@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { LogIn, LogOut, User } from 'lucide-react'
+import { LogIn, LogOut, Package, User } from 'lucide-react'
 import { useCallback, useEffect, useId, useRef, useState, type FocusEvent } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useOptionalAuth } from '../../hooks/useAuth'
@@ -122,6 +122,16 @@ export function UserMenu({ variant, onNavigate }: UserMenuProps) {
           </Link>
         </li>
         <li>
+          <Link
+            to="/mon-compte?tab=commandes"
+            onClick={handleNavClick}
+            className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-text-muted transition-colors hover:bg-brand-muted hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+          >
+            <Package className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
+            Mes commandes
+          </Link>
+        </li>
+        <li>
           <button
             type="button"
             onClick={handleLogout}
@@ -179,6 +189,15 @@ export function UserMenu({ variant, onNavigate }: UserMenuProps) {
               <Link to="/mon-compte" role="menuitem" onClick={handleNavClick} className={menuItemClassName}>
                 <User className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
                 Mon profil
+              </Link>
+              <Link
+                to="/mon-compte?tab=commandes"
+                role="menuitem"
+                onClick={handleNavClick}
+                className={menuItemClassName}
+              >
+                <Package className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
+                Mes commandes
               </Link>
               <button
                 type="button"

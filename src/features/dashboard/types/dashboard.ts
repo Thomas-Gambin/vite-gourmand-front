@@ -110,3 +110,11 @@ export type CreateReviewPayload = {
 }
 
 export type DashboardTab = 'profil' | 'commandes' | 'suivi' | 'avis'
+
+export function parseDashboardTab(value: string | null): DashboardTab {
+  if (value === 'commandes' || value === 'suivi' || value === 'avis') {
+    return value
+  }
+
+  return 'profil'
+}

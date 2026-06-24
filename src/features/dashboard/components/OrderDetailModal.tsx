@@ -4,6 +4,9 @@ import type { UserOrderDetail } from '../types/dashboard'
 import { formatDateFr, formatDateTimeFr, formatPrice } from '../utils/orderStatus'
 import { StatusBadge } from './StatusBadge'
 
+const primaryButtonClassName =
+  'inline-flex cursor-pointer items-center justify-center rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
+
 const secondaryButtonClassName =
   'inline-flex cursor-pointer items-center justify-center rounded-full border border-border bg-surface-elevated px-4 py-2 text-sm font-medium text-text transition hover:border-brand/30 hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
 
@@ -12,9 +15,10 @@ type OrderDetailModalProps = {
   isLoading: boolean
   error: string | null
   onClose: () => void
+  onReviewOrder?: (orderId: number) => void
 }
 
-export function OrderDetailModal({ order, isLoading, error, onClose }: OrderDetailModalProps) {
+export function OrderDetailModal({ order, isLoading, error, onClose, onReviewOrder }: OrderDetailModalProps) {
   useEffect(() => {
     if (!order && !isLoading) return
 
@@ -146,6 +150,25 @@ export function OrderDetailModal({ order, isLoading, error, onClose }: OrderDeta
                   ))}
                 </ul>
               </div>
+            )}
+
+            {order.canReview && onReviewOrder && (
+              <button
+                type="button"
+                className={primaryButtonClassName}
+                onClick={() => {
+                  onReviewOrder(order.id)
+                  onClose()
+                }}
+              >
+                Donner mon avis
+              </button>
+            )}
+
+            {!order.canReview && order.statut !== 'terminee' && order.statut !== 'annulee' && (
+              <p className="text-sm text-text-muted">
+                Vous pourrez déposer un avis lorsque la commande sera terminée.
+              </p>
             )}
 
             <button type="button" onClick={onClose} className={secondaryButtonClassName}>

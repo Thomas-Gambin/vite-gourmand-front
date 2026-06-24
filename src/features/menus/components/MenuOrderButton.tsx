@@ -1,5 +1,5 @@
 import { type MouseEvent } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ShoppingBag } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../shared/hooks/useAuth'
 import type { Menu } from '../types/menu'
@@ -9,7 +9,7 @@ type MenuOrderButtonProps = {
 }
 
 const buttonClassName =
-  'mt-7 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-brand px-6 py-3.5 text-sm font-semibold text-surface-elevated shadow-lg shadow-brand/25 transition hover:-translate-y-0.5 hover:bg-brand-light hover:shadow-xl hover:shadow-brand/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
+  'mt-8 inline-flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-brand px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-brand/30 transition hover:-translate-y-0.5 hover:bg-brand-light hover:shadow-xl hover:shadow-brand/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
 
 export function MenuOrderButton({ menu }: MenuOrderButtonProps) {
   const navigate = useNavigate()
@@ -44,8 +44,9 @@ export function MenuOrderButton({ menu }: MenuOrderButtonProps) {
 
   return (
     <Link to={commandePath} onClick={handleClick} className={buttonClassName}>
+      <ShoppingBag className="h-4 w-4" aria-hidden strokeWidth={1.75} />
       Commander ce menu
-      <ArrowRight className="h-4 w-4" aria-hidden="true" strokeWidth={1.75} />
+      <ArrowRight className="h-4 w-4" aria-hidden strokeWidth={1.75} />
     </Link>
   )
 }

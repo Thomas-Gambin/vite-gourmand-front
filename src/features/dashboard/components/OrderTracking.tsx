@@ -28,18 +28,27 @@ export function OrderTrackingView({ tracking, isLoading, error }: OrderTrackingP
 
   if (!tracking) {
     return (
-      <p className="text-sm text-text-muted">
-        Sélectionnez une commande éligible depuis l’onglet « Mes commandes » pour afficher son suivi.
-      </p>
+      <section aria-labelledby="tracking-empty-title">
+        <h2 id="tracking-empty-title" className="text-xl font-semibold tracking-tight text-text">
+          Suivi de commande
+        </h2>
+        <p className="mt-1.5 text-sm text-text-muted">
+          Sélectionnez une commande éligible depuis l&apos;onglet « Mes commandes » pour afficher son suivi.
+        </p>
+        <div className="mt-8 rounded-2xl border border-dashed border-border/80 bg-surface-muted/50 px-6 py-10 text-center">
+          <p className="text-sm text-text-muted">Aucune commande sélectionnée pour le moment.</p>
+        </div>
+      </section>
     )
   }
 
   return (
     <section aria-labelledby="tracking-title">
-      <div className="flex flex-wrap items-center gap-3">
-        <h2 id="tracking-title" className="text-lg font-bold text-text">
-          Suivi — {tracking.numeroCommande}
-        </h2>
+      <h2 id="tracking-title" className="text-xl font-semibold tracking-tight text-text">
+        Suivi de commande
+      </h2>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <p className="text-sm font-medium text-text">{tracking.numeroCommande}</p>
         <StatusBadge statut={tracking.statutActuel} />
       </div>
 

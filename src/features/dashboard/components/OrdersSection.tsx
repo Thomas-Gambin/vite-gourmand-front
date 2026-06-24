@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { cancelMyOrder, getMyOrder, getMyOrders } from '../api/ordersApi'
+import { dashboardPanelClassName } from '../dashboardUi'
 import type { UserOrderListItem } from '../types/dashboard'
 import { formatDateFr, formatDateTimeFr, formatPrice } from '../utils/orderStatus'
 import { parseApiError } from '../utils/parseApiError'
@@ -18,10 +19,11 @@ const dangerButtonClassName =
 
 type OrdersSectionProps = {
   onTrackOrder: (orderId: number) => void
+  onReviewOrder: (orderId: number) => void
   refreshKey?: number
 }
 
-export function OrdersSection({ onTrackOrder, refreshKey = 0 }: OrdersSectionProps) {
+export function OrdersSection({ onTrackOrder, onReviewOrder, refreshKey = 0 }: OrdersSectionProps) {
   const [orders, setOrders] = useState<UserOrderListItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -87,11 +89,13 @@ export function OrdersSection({ onTrackOrder, refreshKey = 0 }: OrdersSectionPro
   }
 
   return (
-    <section aria-labelledby="orders-section-title" className="rounded-2xl border border-border/60 bg-surface-elevated p-6 shadow-sm sm:p-8">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">Commandes</p>
-      <h2 id="orders-section-title" className="mt-2 text-xl font-bold text-text">
+    <section aria-labelledby="orders-section-title" className={dashboardPanelClassName}>
+      <h2 id="orders-section-title" className="text-xl font-semibold tracking-tight text-text">
         Mes commandes
       </h2>
+      <p className="mt-1.5 text-sm text-text-muted">
+        Retrouvez l&apos;historique de vos commandes, suivez leur avancement ou modifiez-les si besoin.
+      </p>
 
       {actionError && (
         <p className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
@@ -112,15 +116,18 @@ export function OrdersSection({ onTrackOrder, refreshKey = 0 }: OrdersSectionPro
       )}
 
       {!isLoading && !error && orders.length === 0 && (
-        <p className="mt-6 text-sm text-text-muted">Vous n'avez pas encore passé de commande.</p>
+        <div className="mt-8 rounded-2xl border border-dashed border-border/80 bg-surface-muted/50 px-6 py-10 text-center">
+          <p className="text-sm font-medium text-text">Aucune commande pour le moment</p>
+          <p className="mt-1 text-sm text-text-muted">Parcourez nos menus pour passer votre première commande.</p>
+        </div>
       )}
 
       {!isLoading && orders.length > 0 && (
-        <ul className="mt-6 space-y-4">
+        <ul className="mt-8 space-y-4">
           {orders.map((order) => (
             <li
               key={order.id}
-              className="rounded-xl border border-border/60 bg-surface p-4 sm:p-5"
+              className="rounded-2xl border border-border/60 bg-surface p-5 shadow-sm transition hover:border-brand/20 hover:shadow-md sm:p-6"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -161,6 +168,15 @@ export function OrdersSection({ onTrackOrder, refreshKey = 0 }: OrdersSectionPro
                 <button type="button" className={primaryButtonClassName} onClick={() => void openDetail(order.id)}>
                   Voir le détail
                 </button>
+                {order.canReview && (
+                  <button
+                    type="button"
+                    className={primaryButtonClassName}
+                    onClick={() => onReviewOrder(order.id)}
+                  >
+                    Donner mon avis
+                  </button>
+                )}
                 <button
                   type="button"
                   className={secondaryButtonClassName}
@@ -189,6 +205,12 @@ export function OrdersSection({ onTrackOrder, refreshKey = 0 }: OrdersSectionPro
                   Annuler
                 </button>
               </div>
+
+              {!order.canReview && order.statut !== 'terminee' && order.statut !== 'annulee' && (
+                <p className="mt-3 text-sm text-text-muted">
+                  Vous pourrez déposer un avis lorsque la commande sera terminée.
+                </p>
+              )}
             </li>
           ))}
         </ul>
@@ -199,6 +221,7 @@ export function OrdersSection({ onTrackOrder, refreshKey = 0 }: OrdersSectionPro
         isLoading={detailLoading && detailId !== null}
         error={detailError}
         onClose={closeDetail}
+        onReviewOrder={onReviewOrder}
       />
 
       <OrderEditModal
