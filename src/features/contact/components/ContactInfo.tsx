@@ -1,5 +1,5 @@
 import { Clock, Mail, MapPin, MessageCircle } from 'lucide-react'
-import { OPENING_HOURS } from '../../../shared/config/openingHours'
+import { getTodayOpeningHour, useOpeningHours } from '../../../shared/hooks/useOpeningHours'
 
 const infoItems = [
   {
@@ -23,7 +23,8 @@ const infoItems = [
 ] as const
 
 export function ContactInfo() {
-  const todayEntry = OPENING_HOURS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]
+  const openingHours = useOpeningHours()
+  const todayEntry = getTodayOpeningHour(openingHours)
 
   return (
     <div className="space-y-5">

@@ -1,10 +1,8 @@
-export type OpeningHour = {
-  day: string
-  hours: string
-  isClosed?: boolean
-}
+import type { OpeningHour } from '../types/openingHours'
 
-export const OPENING_HOURS: OpeningHour[] = [
+export type { OpeningHour } from '../types/openingHours'
+
+export const DEFAULT_OPENING_HOURS: OpeningHour[] = [
   { day: 'Lundi', hours: '09h00 - 18h00' },
   { day: 'Mardi', hours: '09h00 - 18h00' },
   { day: 'Mercredi', hours: '09h00 - 18h00' },

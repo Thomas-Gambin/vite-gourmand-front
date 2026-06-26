@@ -1,11 +1,13 @@
 import { Clock, MapPin, UtensilsCrossed } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LEGAL_LINKS } from '../../config/navigation'
-import { OPENING_HOURS } from '../../config/openingHours'
+import { useOpeningHours } from '../../hooks/useOpeningHours'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
 export function Footer() {
+  const openingHours = useOpeningHours()
+
   return (
     <footer className="mt-auto border-t border-border bg-surface-muted">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-10 md:grid-cols-3 md:gap-12">
@@ -34,7 +36,7 @@ export function Footer() {
             Horaires d&apos;ouverture
           </h2>
           <dl className="mt-3 space-y-1.5 text-sm">
-            {OPENING_HOURS.map((entry) => (
+            {openingHours.map((entry) => (
               <div key={entry.day} className="flex justify-between gap-4">
                 <dt className="text-text">{entry.day}</dt>
                 <dd className={entry.isClosed ? 'font-medium text-brand' : 'text-text-muted'}>
