@@ -5,6 +5,7 @@ type ApiMenuDish = {
   name: string
   type: 'Entrée' | 'Plat' | 'Dessert'
   description?: string | null
+  photo?: string | null
   allergens: { id: number; name: string }[]
 }
 
@@ -41,6 +42,7 @@ export function mapApiMenuToMenu(apiMenu: ApiMenu): Menu {
       name: dish.name,
       type: dish.type,
       description: dish.description ?? undefined,
+      photo: dish.photo ?? undefined,
       allergens: dish.allergens,
     })),
   }

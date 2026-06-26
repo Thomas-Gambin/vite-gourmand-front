@@ -10,6 +10,7 @@ type MenuImageProps = {
   placeholderIconClassName?: string
   rounded?: boolean
   placeholderTitle?: string
+  hidePlaceholder?: boolean
 }
 
 export function MenuImage({
@@ -20,11 +21,16 @@ export function MenuImage({
   placeholderIconClassName,
   rounded = false,
   placeholderTitle,
+  hidePlaceholder = false,
 }: MenuImageProps) {
   const [hasError, setHasError] = useState(false)
   const resolvedSrc = resolveMenuImageUrl(src)
 
   if (!resolvedSrc || hasError) {
+    if (hidePlaceholder) {
+      return null
+    }
+
     return (
       <MenuImagePlaceholder
         title={placeholderTitle}

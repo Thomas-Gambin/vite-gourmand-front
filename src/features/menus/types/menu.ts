@@ -10,6 +10,7 @@ export type Dish = {
   name: string
   type: DishType
   description?: string
+  photo?: string
   allergens: Allergen[]
 }
 
