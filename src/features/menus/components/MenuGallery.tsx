@@ -63,31 +63,40 @@ export function MenuGallery({ title, images }: MenuGalleryProps) {
       </div>
 
       {images.length > 1 ? (
-        <ul className="flex gap-2 overflow-x-auto pb-1" aria-label="Miniatures du menu">
-          {images.map((image, index) => (
-            <li key={`${image}-${index}`} className="shrink-0">
-              <button
-                type="button"
-                onClick={() => setSelectedIndex(index)}
-                aria-label={`Afficher la photo ${index + 1}`}
-                aria-current={selectedIndex === index ? 'true' : undefined}
-                className={[
-                  'cursor-pointer overflow-hidden rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
-                  selectedIndex === index
-                    ? 'ring-2 ring-brand ring-offset-2'
-                    : 'opacity-55 hover:opacity-100',
-                ].join(' ')}
-              >
-                <MenuImage
-                  src={image}
-                  alt=""
-                  className="h-14 w-[4.5rem] object-cover sm:h-16 sm:w-20"
-                  placeholderClassName="h-14 w-[4.5rem] sm:h-16 sm:w-20"
-                  placeholderIconClassName="h-5 w-5"
-                />
-              </button>
-            </li>
-          ))}
+        <ul
+          className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-0.5 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-label="Miniatures du menu"
+        >
+          {images.map((image, index) => {
+            const isSelected = selectedIndex === index
+
+            return (
+              <li key={`${image}-${index}`} className="shrink-0 snap-start">
+                <button
+                  type="button"
+                  onClick={() => setSelectedIndex(index)}
+                  aria-label={`Afficher la photo ${index + 1}`}
+                  aria-current={isSelected ? 'true' : undefined}
+                  className={[
+                    'box-border block rounded-xl bg-surface-muted transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
+                    isSelected
+                      ? 'border-2 border-brand shadow-md shadow-brand/10'
+                      : 'border-2 border-transparent opacity-75 hover:opacity-100',
+                  ].join(' ')}
+                >
+                  <div className="flex aspect-[4/3] w-[5.75rem] items-center justify-center sm:w-24">
+                    <MenuImage
+                      src={image}
+                      alt=""
+                      className="max-h-full max-w-full object-contain"
+                      placeholderClassName="h-full w-full"
+                      placeholderIconClassName="h-5 w-5"
+                    />
+                  </div>
+                </button>
+              </li>
+            )
+          })}
         </ul>
       ) : null}
     </div>
